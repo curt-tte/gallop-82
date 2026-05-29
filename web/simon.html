@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gallop 82 &mdash; Simon</title>
+<link rel="stylesheet" href="calc.css" />
+</head>
+<body>
+<script src="calc.js"></script>
+<script>
+const c = Calc({ brand: "GALLOP 82" });
+const FREQ = { 1: 330, 2: 415, 3: 494, 4: 659 };  // one tone per pad
+const POS  = { 1: [3, 3], 2: [3, 12], 3: [6, 3], 4: [6, 12] };
+let seq, idx, accepting, best, status;
+best = parseInt(localStorage.getItem("simon_best") || "0", 10);
+
+function newGame() {
+  seq = []; best = parseInt(localStorage.getItem("simon_best") || "0", 10);
+  c.setControls([
+    { label: "1", keys: ["1"], onClick: () => press(1) },
+    { label: "2", keys: ["2"], onClick: () => press(2) },
+    { label: "3", keys: ["3"], onClick: () => press(3) },
+    { label: "4", keys: ["4"], onClick: () => press(4) },
+  ]);
+  nextRound();
+}
+
+function nextRound() {
+  accepting = false;
+  status = "WATCH...";
+  seq.push(Math.floor(Math.random() * 4) + 1);
+  idx = 0;
+  drawPads(0);
+  playSequence();
+}
+
+function flash(pad, on) {
+  drawPads(on ? pad : 0);
+  if (on) c.tone(FREQ[pad], 0.32, "sine", 0.18);
+}
+
+function playSequence() {
+  let i = 0;
+  const speed = Math.max(280, 600 - seq.length * 18);
+  const run = () => {
+    if (i >= seq.length) {
+      accepting = true;
+      status = "YOUR TURN";
+      drawPads(0);
+      return;
+    }
+    const pad = seq[i++];
+    flash(pad, true);
+    setTimeout(() => flash(pad, false), speed * 0.6);
+    setTimeout(run, speed);
+  };
+  setTimeout(run, 500);
+}
+
+function press(pad) {
+  if (!accepting) return;
+  flash(pad, true);
+  setTimeout(() => flash(pad, false), 160);
+  if (pad !== seq[idx]) return lose();
+  idx++;
+  if (idx === seq.length) {
+    accepting = false;
+    if (seq.length > best) { best = seq.length; localStorage.setItem("simon_best", best); }
+    setTimeout(nextRound, 700);
+  }
+}
+
+function drawPads(active) {
+  c.clr();
+  c.out(1, 1, "SIMON  RND " + seq.length);
+  for (const p of [1, 2, 3, 4]) {
+    const [r, col] = POS[p];
+    c.out(r, col, active === p ? "[" + p + "]" : " " + p + " ");
+  }
+  c.out(8, 1, (status || "") + "  BEST " + best);
+  c.render();
+}
+
+function lose() {
+  accepting = false;
+  c.clr();
+  c.out(1, 1, "GAME OVER");
+  c.out(3, 1, "ROUND: " + seq.length);
+  c.out(4, 1, "BEST:  " + best);
+  c.render();
+  c.arp([392, 330, 262], "sawtooth", 0.13, 0.13);
+  c.setControls([{ label: "PLAY AGAIN", primary: true, onClick: newGame }]);
+  c.setHint("Repeat the sequence with keys <kbd>1</kbd>-<kbd>4</kbd>.");
+}
+
+c.setHint("Watch the pads light up, then repeat with <kbd>1</kbd>-<kbd>4</kbd>.");
+newGame();
+</script>
+</body>
+</html>

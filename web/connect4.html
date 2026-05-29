@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gallop 82 &mdash; Connect Four</title>
+<link rel="stylesheet" href="calc.css" />
+</head>
+<body>
+<script src="calc.js"></script>
+<script>
+const c = Calc({ brand: "GALLOP 82" });
+const NR = 6, NC = 7;            // 6 rows x 7 columns board
+const SYM = { 1: "X", 2: "O", 0: "." };
+const sx = col => 2 * col + 1;   // board col -> screen col (1,3,5,...,13)
+let grid, sel, turn, over;
+
+function newGame() {
+  grid = Array.from({ length: NR }, () => Array(NC).fill(0));
+  sel = 3; turn = 1; over = false;
+  draw();
+  c.setControls([
+    { label: "\u25C0", keys: ["ArrowLeft"], onClick: () => moveSel(-1) },
+    { label: "\u25B6", keys: ["ArrowRight"], onClick: () => moveSel(1) },
+    { label: "DROP", primary: true, keys: ["ArrowDown", " "], onClick: drop },
+  ]);
+}
+
+function moveSel(d) {
+  if (over) return;
+  sel = (sel + d + NC) % NC;
+  c.blip();
+  draw();
+}
+
+function drop() {
+  if (over) return;
+  let r = -1;
+  for (let i = NR - 1; i >= 0; i--) if (grid[i][sel] === 0) { r = i; break; }
+  if (r < 0) return;             // column full
+  grid[r][sel] = turn;
+  c.tone(turn === 1 ? 560 : 420, 0.08, "square", 0.12);
+  if (wins(r, sel, turn)) return finish("PLAYER " + turn + " (" + SYM[turn] + ") WINS!");
+  if (grid[0].every((_, col) => grid[0][col] !== 0)) return finish("DRAW GAME");
+  turn = turn === 1 ? 2 : 1;
+  draw();
+}
+
+function wins(r, col, p) {
+  const dirs = [[0, 1], [1, 0], [1, 1], [1, -1]];
+  return dirs.some(([dr, dc]) => {
+    let n = 1;
+    for (const s of [1, -1]) {
+      let rr = r + dr * s, cc = col + dc * s;
+      while (rr >= 0 && rr < NR && cc >= 0 && cc < NC && grid[rr][cc] === p) {
+        n++; rr += dr * s; cc += dc * s;
+      }
+    }
+    return n >= 4;
+  });
+}
+
+function draw() {
+  c.clr();
+  c.out(1, sx(sel), "v");                          // column cursor
+  for (let r = 0; r < NR; r++)
+    for (let col = 0; col < NC; col++)
+      c.out(r + 2, sx(col), SYM[grid[r][col]]);
+  c.render();
+  c.setHint("Player <strong>" + turn + "</strong> &mdash; " + SYM[turn] +
+            ". Arrows move, Drop to play.");
+}
+
+function finish(msg) {
+  over = true;
+  draw();
+  c.clr();
+  c.out(2, 1, msg);
+  c.render();
+  if (msg.indexOf("WINS") >= 0) c.arp([523, 659, 784, 1047], "triangle", 0.1);
+  else c.arp([440, 392], "sawtooth", 0.16, 0.13);
+  c.setControls([{ label: "NEW GAME", primary: true, onClick: newGame }]);
+  c.setHint("Press <kbd>Enter</kbd> for a new game.");
+}
+
+newGame();
+</script>
+</body>
+</html>

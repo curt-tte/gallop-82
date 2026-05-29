@@ -1,0 +1,53 @@
+PROGRAM:SIMON
+:ClrHome
+:Disp "REPEAT SEQUENCE","KEYS 1-4","CLEAR=QUIT","ENTER=START"
+:Pause
+:0->dim(L1)
+:0->N
+:Lbl 0
+:N+1->N
+:int(4rand)+1->L1(N)
+:For(I,1,N)
+:ClrHome
+:Output(1,1,"WATCH")
+:Output(3,5,L1(I))
+:For(Z,1,400)
+:End
+:ClrHome
+:Output(1,1,"WATCH")
+:For(Z,1,150)
+:End
+:End
+:ClrHome
+:Output(1,1,"YOUR TURN")
+:For(I,1,N)
+:0->G
+:Repeat G>0
+:getKey->K
+:If K=45
+:Goto 9
+:If K=92
+:1->G
+:If K=93
+:2->G
+:If K=94
+:3->G
+:If K=82
+:4->G
+:End
+:Output(5,2G,"*")
+:If G-L1(I)
+:Goto 8
+:End
+:Goto 0
+:Lbl 8
+:ClrHome
+:Output(1,1,"WRONG!")
+:Output(2,1,"ROUND")
+:Output(2,7,N)
+:Goto 9
+:Lbl 9
+:ClrHome
+:Output(1,1,"SIMON OVER")
+:Output(2,1,"ROUND")
+:Output(2,7,N)

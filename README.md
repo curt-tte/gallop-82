@@ -17,6 +17,9 @@ family), which means it also runs unchanged on the **TI-83 / TI-83+ / TI-84+ / T
 | `HORSE`    | `games/HORSE.txt`        | Betting parlor: pick 2-6 horses with speeds/odds, wager your cash, race, repeat. |
 | `SNAKE`    | `games/SNAKE.txt`        | The classic: eat `X`, grow longer, don't hit the walls or yourself. |
 | `BLACKJK`  | `games/BLACKJK.txt`      | Blackjack vs the dealer: hit/stand, soft aces, persistent cash. |
+| `PONG`     | `games/PONG.txt`         | Volley against the CPU paddle; first to 5 points wins.   |
+| `CONNECT4` | `games/CONNECT4.txt`     | Two-player Connect Four on a 6x7 board (uses matrix `[A]`). |
+| `SIMON`    | `games/SIMON.txt`        | Memory game: repeat the growing sequence with keys `1`-`4` (uses list `L1`). |
 
 ## TI-82 compatibility notes
 
@@ -43,7 +46,12 @@ A couple of source-notation tips for typing these in:
 ```
  Up    = 25      Left  = 24      CLEAR = 45
  Down  = 34      Right = 26      ENTER = 105
+ 1     = 92      2     = 93      3     = 94      4 = 82
 ```
+
+`SIMON` reads the number keys `1`-`4` (codes above). `CONNECT4` uses the matrix
+`[A]` as its board, and `SIMON` uses list `L1` for its sequence &mdash; running them
+overwrites those.
 
 ## How to get these onto a calculator
 

@@ -1,0 +1,81 @@
+PROGRAM:CONNECT4
+:ClrHome
+:Disp "LEFT/RIGHT MOVE","DOWN=DROP","CLEAR=QUIT","ENTER=START"
+:Pause
+:{6,7}->dim([A])
+:Fill(0,[A])
+:1->P
+:4->J
+:0->W
+:0->M
+:0->K
+:ClrHome
+:For(R,1,6)
+:For(C,1,7)
+:Output(R+1,2C-1,".")
+:End
+:End
+:Output(1,2J-1,"V")
+:Repeat W>0 or M=42 or K=45
+:getKey->K
+:Output(1,2J-1," ")
+:If K=24 and J>1
+:J-1->J
+:If K=26 and J<7
+:J+1->J
+:Output(1,2J-1,"V")
+:If K=34
+:Then
+:0->R
+:For(I,6,1,-1)
+:If [A](I,J)=0 and R=0
+:I->R
+:End
+:If R>0
+:Then
+:P->[A](R,J)
+:M+1->M
+:If P=1
+:Output(R+1,2J-1,"X")
+:If P=2
+:Output(R+1,2J-1,"O")
+:For(Y,1,6)
+:For(X,1,4)
+:If [A](Y,X)=P and [A](Y,X+1)=P and [A](Y,X+2)=P and [A](Y,X+3)=P
+:P->W
+:End
+:End
+:For(Y,1,3)
+:For(X,1,7)
+:If [A](Y,X)=P and [A](Y+1,X)=P and [A](Y+2,X)=P and [A](Y+3,X)=P
+:P->W
+:End
+:End
+:For(Y,1,3)
+:For(X,1,4)
+:If [A](Y,X)=P and [A](Y+1,X+1)=P and [A](Y+2,X+2)=P and [A](Y+3,X+3)=P
+:P->W
+:End
+:End
+:For(Y,1,3)
+:For(X,4,7)
+:If [A](Y,X)=P and [A](Y+1,X-1)=P and [A](Y+2,X-2)=P and [A](Y+3,X-3)=P
+:P->W
+:End
+:End
+:If W=0
+:Then
+:3-P->P
+:End
+:End
+:End
+:End
+:ClrHome
+:If W>0
+:Then
+:Output(1,1,"PLAYER")
+:Output(1,8,W)
+:Output(2,1,"WINS!")
+:Else
+:Output(1,1,"DRAW/QUIT")
+:End
