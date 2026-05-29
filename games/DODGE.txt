@@ -1,0 +1,34 @@
+PROGRAM:DODGE
+:ClrHome
+:Disp "ARROWS=MOVE","CLEAR=QUIT","","ENTER TO START"
+:Pause
+:ClrHome
+:8->P
+:0->S
+:1->R
+:int(16rand)+1->C
+:Output(8,P,"X")
+:Repeat K=45
+:getKey->K
+:Output(8,P," ")
+:If K=24 and P>1
+:P-1->P
+:If K=26 and P<16
+:P+1->P
+:Output(R,C," ")
+:R+1->R
+:If R>8
+:Then
+:1->R
+:int(16rand)+1->C
+:S+1->S
+:End
+:Output(8,P,"X")
+:Output(R,C,"O")
+:If R=8 and C=P
+:Then
+:45->K
+:End
+:End
+:ClrHome
+:Disp "GAME OVER","SCORE:",S

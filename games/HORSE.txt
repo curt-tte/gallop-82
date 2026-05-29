@@ -1,0 +1,95 @@
+PROGRAM:HORSE
+:ClrHome
+:If M<1
+:100->M
+:1->Q
+:While Q=1
+:ClrHome
+:If M>N
+:M->N
+:Output(1,1,"BALANCE $")
+:Output(1,11,M)
+:Output(2,1,"BEST $")
+:Output(2,7,N)
+:0->H
+:Repeat H>=2 and H<=6
+:Input "HOW MANY 2-6? ",H
+:End
+:ClrHome
+:For(I,1,H)
+:int(3rand)+2->L2(I)
+:2->L1(I)
+:Output(I,1,I)
+:Output(I,3,"SPD")
+:Output(I,6,L2(I))
+:Output(I,9,"PAYS X")
+:Output(I,15,6-L2(I))
+:End
+:0->B
+:Repeat B>=1 and B<=H
+:Input "BET HORSE? ",B
+:End
+:0->G
+:Repeat G>=1 and G<=M
+:Input "WAGER? ",G
+:End
+:M-G->M
+:ClrHome
+:Output(1,1,"BET H")
+:Output(1,6,B)
+:Output(1,9,"$")
+:Output(1,10,G)
+:For(I,1,H)
+:Output(I+1,1,I)
+:Output(I+1,4,"Q")
+:End
+:Pause
+:0->W
+:Repeat W>0
+:For(I,1,H)
+:Output(I+1,L1(I)+2," ")
+:L1(I)+int(L2(I)rand)->L1(I)
+:If L1(I)>14
+:14->L1(I)
+:Output(I+1,L1(I)+2,"Q")
+:If L1(I)>=14 and W=0
+:I->W
+:End
+:End
+:ClrHome
+:Output(1,1,"WINNER: HORSE")
+:Output(1,14,W)
+:If W=B
+:Then
+:G(6-L2(B))->P
+:int(P/10)->T
+:M+P-T->M
+:Output(3,1,"YOU WIN!")
+:Output(4,1,"PAID $")
+:Output(4,7,P-T)
+:Output(5,1,"TAKE $")
+:Output(5,7,T)
+:Else
+:Output(3,1,"YOU LOSE")
+:End
+:0->D
+:If M>N
+:Then
+:M->N
+:1->D
+:End
+:Output(6,1,"BALANCE $")
+:Output(6,11,M)
+:Output(7,1,"BEST $")
+:Output(7,7,N)
+:If D=1 and W=B
+:Output(8,1,"* NEW BEST! *")
+:If D=0 or W≠B
+:Output(8,1,"          ")
+:Pause
+:0->Q
+:If M>=1
+:Input "RACE AGAIN? 1/0 ",Q
+:End
+:ClrHome
+:Output(4,1,"THANKS FOR PLAYING")

@@ -1,0 +1,85 @@
+PROGRAM:SNAKE
+:ClrHome
+:Disp "SNAKE","ARROWS TO TURN","CLEAR TO QUIT","","ENTER TO START"
+:Pause
+:ClrHome
+:{8,16->dim([A])
+:130->Z
+:4->R
+:8->C
+:0->U
+:1->V
+:1->H
+:1->T
+:R->L1(1)
+:C->L2(1)
+:1->[A](R,C)
+:0->S
+:Repeat [A](F,G)=0
+:int(8rand)+1->F
+:int(16rand)+1->G
+:End
+:Output(F,G,"X")
+:Output(R,C,"O")
+:0->Q
+:Repeat Q=1
+:getKey->K
+:If K=45
+:1->Q
+:If K=25 and U=0
+:Then
+:-1->U
+:0->V
+:End
+:If K=34 and U=0
+:Then
+:1->U
+:0->V
+:End
+:If K=24 and V=0
+:Then
+:0->U
+:-1->V
+:End
+:If K=26 and V=0
+:Then
+:0->U
+:1->V
+:End
+:R+U->R
+:C+V->C
+:If R<1 or R>8 or C<1 or C>16
+:Then
+:1->Q
+:Else
+:If [A](R,C)=1
+:Then
+:1->Q
+:Else
+:H+1->H
+:If H>Z
+:1->H
+:R->L1(H)
+:C->L2(H)
+:1->[A](R,C)
+:Output(R,C,"O")
+:If R=F and C=G
+:Then
+:S+1->S
+:Repeat [A](F,G)=0
+:int(8rand)+1->F
+:int(16rand)+1->G
+:End
+:Output(F,G,"X")
+:Else
+:0->[A](L1(T),L2(T))
+:Output(L1(T),L2(T)," ")
+:T+1->T
+:If T>Z
+:1->T
+:End
+:End
+:End
+:End
+:ClrHome
+:Disp "GAME OVER","SCORE:",S

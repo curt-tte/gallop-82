@@ -1,0 +1,15 @@
+PROGRAM:NUMGUESS
+:ClrHome
+:int(100rand)+1->N
+:0->G
+:Disp "GUESS 1 TO 100"
+:Repeat A=N
+:Input "GUESS? ",A
+:G+1->G
+:If A>N
+:Disp "TOO HIGH"
+:If A<N
+:Disp "TOO LOW"
+:End
+:ClrHome
+:Disp "CORRECT!","TRIES:",G
