@@ -387,7 +387,7 @@ function startRace() {
 function showResult(W, photo) {
   clr();
   out(1, 1, photo ? "PHOTO FINISH!" : "WINNER:");
-  out(2, 1, fit(NAME[W]));
+  out(2, 1, fit("H" + W + " " + NAME[W]));
   let newBest = false;
   if (W === bet) {
     const P = wager * (6 - L2[bet]);
@@ -412,8 +412,8 @@ function showResult(W, photo) {
 
   let msg = "";
   if (photo) {
-    msg += "<strong>Photo finish!</strong> Two or more horses crossed on the same stride, so the win went to <strong>" +
-           NAME[W] + "</strong> &mdash; the one that lunged furthest past the line. ";
+    msg += "<strong>Photo finish!</strong> Two or more horses crossed on the same stride, so the win went to <strong>H" +
+           W + " " + NAME[W] + "</strong> &mdash; the one that lunged furthest past the line. ";
   }
   msg += M < 1 ? "You're broke! Reset for a fresh $100." : "Race again or change the field. <kbd>Enter</kbd>";
   setHint(msg);
