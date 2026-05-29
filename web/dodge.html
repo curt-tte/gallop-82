@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gallop 82 &mdash; Dodge</title>
+<link rel="stylesheet" href="calc.css" />
+</head>
+<body>
+<script src="calc.js"></script>
+<script>
+const c = Calc({ brand: "GALLOP 82" });
+const rndCol = () => Math.floor(Math.random() * 16) + 1;
+
+let P, score, R, C, timer, running;
+
+function newGame() {
+  P = 8; score = 0; R = 1; C = rndCol(); running = true;
+  draw();
+  c.setControls([
+    { label: "\u25C0 LEFT", keys: ["ArrowLeft"], onClick: () => move(-1) },
+    { label: "RIGHT \u25B6", keys: ["ArrowRight"], onClick: () => move(1) },
+  ]);
+  schedule();
+}
+
+function schedule() {
+  clearTimeout(timer);
+  timer = setTimeout(frame, Math.max(70, 165 - score * 4));
+}
+
+function frame() {
+  if (!running) return;
+  R++;
+  if (R === 8 && C === P) return dead();
+  if (R > 8) { R = 1; C = rndCol(); score++; }
+  draw();
+  c.noise(0.03, 0.10, 500);
+  schedule();
+}
+
+function move(d) {
+  if (!running) return;
+  P = Math.min(16, Math.max(1, P + d));
+  if (R === 8 && C === P) return dead();
+  draw();
+}
+
+function draw() {
+  c.clr();
+  c.out(8, P, "@");
+  c.out(R, C, "O");
+  c.render();
+  c.setHint("Slide under the falling rocks!  Score: <strong>" + score + "</strong>");
+}
+
+function dead() {
+  running = false; clearTimeout(timer);
+  c.clr();
+  c.out(1, 1, "GAME OVER");
+  c.out(3, 1, "SCORE: " + score);
+  c.render();
+  c.arp([392, 330, 262], "sawtooth", 0.13, 0.13);
+  c.setControls([{ label: "PLAY AGAIN", primary: true, onClick: newGame }]);
+  c.setHint("Press <kbd>Enter</kbd> to try again.");
+}
+
+newGame();
+</script>
+</body>
+</html>

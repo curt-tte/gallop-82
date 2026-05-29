@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gallop 82 &mdash; Snake</title>
+<link rel="stylesheet" href="calc.css" />
+</head>
+<body>
+<script src="calc.js"></script>
+<script>
+const c = Calc({ brand: "GALLOP 82" });
+const ROWS = 8, COLS = 16;
+const rndR = () => Math.floor(Math.random() * ROWS) + 1;
+const rndC = () => Math.floor(Math.random() * COLS) + 1;
+
+let snake, dir, nextDir, food, timer, score, best, madeBest;
+best = parseInt(localStorage.getItem("snake_best") || "0", 10);
+
+function occupied(r, col) { return snake.some(s => s[0] === r && s[1] === col); }
+function placeFood() { let p; do { p = [rndR(), rndC()]; } while (occupied(p[0], p[1])); food = p; }
+
+function newGame() {
+  snake = [[4, 7], [4, 8]];      // head is last element
+  dir = [0, 1]; nextDir = [0, 1];
+  score = 0; madeBest = false;
+  placeFood();
+  play();
+}
+
+function setDir(r, col) {
+  if (snake.length > 1 && r === -dir[0] && col === -dir[1]) return; // no 180s
+  nextDir = [r, col];
+}
+
+function step() {
+  dir = nextDir;
+  const head = snake[snake.length - 1];
+  const nr = head[0] + dir[0], nc = head[1] + dir[1];
+  if (nr < 1 || nr > ROWS || nc < 1 || nc > COLS) return dead();
+  const eating = (nr === food[0] && nc === food[1]);
+  const body = eating ? snake : snake.slice(1); // tail vacates unless we grow
+  if (body.some(s => s[0] === nr && s[1] === nc)) return dead();
+  snake.push([nr, nc]);
+  if (eating) {
+    score++;
+    c.tone(880, 0.06);
+    if (score > best) { best = score; madeBest = true; localStorage.setItem("snake_best", best); }
+    placeFood();
+  } else {
+    snake.shift();
+  }
+  draw();
+  c.noise(0.02, 0.05, 1400);
+  timer = setTimeout(step, Math.max(80, 150 - score * 4));
+}
+
+function draw() {
+  c.clr();
+  snake.forEach((s, i) => c.out(s[0], s[1], i === snake.length - 1 ? "@" : "O"));
+  c.out(food[0], food[1], "X");
+  c.render();
+  c.setHint("Eat the <strong>X</strong>.  Score: <strong>" + score + "</strong>  Best: " + best);
+}
+
+function play() {
+  draw();
+  c.setControls([
+    { label: "\u25B2", keys: ["ArrowUp"], onClick: () => setDir(-1, 0) },
+    { label: "\u25BC", keys: ["ArrowDown"], onClick: () => setDir(1, 0) },
+    { label: "\u25C0", keys: ["ArrowLeft"], onClick: () => setDir(0, -1) },
+    { label: "\u25B6", keys: ["ArrowRight"], onClick: () => setDir(0, 1) },
+  ]);
+  c.setHint("Steer with arrows. Eat X; avoid walls and yourself.");
+  clearTimeout(timer);
+  timer = setTimeout(step, 150);
+}
+
+function dead() {
+  clearTimeout(timer);
+  c.clr();
+  c.out(1, 1, "GAME OVER");
+  c.out(3, 1, "SCORE: " + score);
+  c.out(4, 1, "BEST:  " + best);
+  if (madeBest && score > 0) c.out(6, 1, "* NEW BEST! *");
+  c.render();
+  if (madeBest && score > 0) c.arp([784, 988, 1175, 1568], "square", 0.09);
+  else c.arp([392, 330, 262], "sawtooth", 0.13, 0.13);
+  c.setControls([{ label: "PLAY AGAIN", primary: true, onClick: newGame }]);
+  c.setHint("Press <kbd>Enter</kbd> to play again.");
+}
+
+newGame();
+</script>
+</body>
+</html>

@@ -1,0 +1,137 @@
+/* Shared calculator look for all Gallop 82 web games. */
+:root {
+  --case: #2b2f36;
+  --case-edge: #1a1d22;
+  --btn: #3a4049;
+  --btn-edge: #20242a;
+  --btn-text: #e8e8e8;
+  --accent: #f5c542;
+  --lcd-bg: #9ead86;
+  --lcd-dark: #2c331f;
+  --green: #4cff3a;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 20%, #3a4250, #14171c 70%);
+  font-family: "Segoe UI", system-ui, sans-serif;
+  padding: 24px;
+}
+.calc {
+  width: 372px;
+  background: linear-gradient(180deg, var(--case) 0%, var(--case-edge) 100%);
+  border-radius: 28px 28px 18px 18px;
+  padding: 20px 22px 26px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06);
+  border: 1px solid #000;
+}
+.brand {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.led {
+  display: inline-block;
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #9dff7a, #2e9b22);
+  box-shadow: 0 0 7px var(--green), inset 0 0 2px #0a3d06;
+  margin-right: 7px;
+  vertical-align: middle;
+  animation: pulse 2.4s infinite ease-in-out;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.55} }
+.bezel {
+  background: #11140f;
+  border-radius: 10px;
+  padding: 12px;
+  box-shadow: inset 0 3px 10px rgba(0,0,0,0.7);
+}
+.lcd {
+  position: relative;
+  background: var(--lcd-bg);
+  border-radius: 4px;
+  padding: 10px 12px;
+  color: var(--lcd-dark);
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 15px;
+  line-height: 1.32;
+  white-space: pre;
+  min-height: 196px;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.18);
+  letter-spacing: 1px;
+  overflow: hidden;
+}
+.lcd::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.06) 0 1px, transparent 1px 3px),
+    radial-gradient(circle at 30% 0%, rgba(255,255,255,0.18), transparent 60%);
+  mix-blend-mode: multiply;
+}
+.controls {
+  margin-top: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+.hint {
+  text-align: center;
+  color: #9aa0a8;
+  font-size: 12px;
+  min-height: 30px;
+  margin-top: 10px;
+  line-height: 1.4;
+}
+.hint kbd {
+  background: #20242a;
+  border: 1px solid #000;
+  border-radius: 4px;
+  padding: 1px 5px;
+  color: #d6dae0;
+  font-size: 11px;
+  font-family: inherit;
+}
+button {
+  flex: 0 0 auto;
+  background: linear-gradient(180deg, var(--btn) 0%, var(--btn-edge) 100%);
+  color: var(--btn-text);
+  border: 1px solid #000;
+  border-radius: 8px;
+  padding: 9px 13px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 4px rgba(0,0,0,0.4);
+  transition: transform 0.05s ease, filter 0.1s ease;
+  min-width: 42px;
+}
+button:hover { filter: brightness(1.15); }
+button:active { transform: translateY(1px); }
+button.primary {
+  background: linear-gradient(180deg, #f5c542, #d09a16);
+  color: #1a1d22;
+  border-color: #000;
+}
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+.sound-toggle {
+  background: none; border: none; color: #9aa0a8; cursor: pointer;
+  font-size: 12px; padding: 0; min-width: 0; box-shadow: none;
+}
+.sound-toggle:hover { filter: none; color: var(--accent); }
+.backlink { text-align: center; margin-top: 14px; }
+.backlink a { color: #9aa0a8; font-size: 12px; text-decoration: none; }
+.backlink a:hover { color: var(--accent); }

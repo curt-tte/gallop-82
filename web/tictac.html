@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gallop 82 &mdash; Tic-Tac-Toe</title>
+<link rel="stylesheet" href="calc.css" />
+</head>
+<body>
+<script src="calc.js"></script>
+<script>
+const c = Calc({ brand: "GALLOP 82" });
+const WINS = [[1,2,3],[4,5,6],[7,8,9],[1,4,7],[2,5,8],[3,6,9],[1,5,9],[3,5,7]];
+
+let board, turn, over;
+
+function newGame() { board = [0,0,0,0,0,0,0,0,0]; turn = 1; over = false; play(); }
+
+function sym(v, i) { return v === 1 ? "X" : v === 2 ? "O" : String(i + 1); }
+
+function drawBoard(title) {
+  c.clr();
+  c.out(1, 1, title !== undefined ? title : ("PLAYER " + turn + " (" + (turn === 1 ? "X" : "O") + ")"));
+  c.out(4, 1, "---+---+---");
+  c.out(6, 1, "---+---+---");
+  for (let i = 0; i < 9; i++) {
+    const r = Math.floor(i / 3), col = i % 3;
+    const row = 3 + 2 * r;          // rows 3, 5, 7
+    c.out(row, 4, "|"); c.out(row, 8, "|");
+    c.out(row, 2 + 4 * col, sym(board[i], i)); // cols 2, 6, 10
+  }
+  c.render();
+}
+
+function numButtons() {
+  const b = [];
+  for (let i = 0; i < 9; i++) b.push({ label: String(i + 1), keys: [String(i + 1)], onClick: () => place(i) });
+  return b;
+}
+
+function play() {
+  drawBoard();
+  c.setControls(numButtons());
+  c.setHint("Press <kbd>1</kbd>&ndash;<kbd>9</kbd> (or tap) to claim a square.");
+}
+
+function place(i) {
+  if (over || board[i] !== 0) { c.tone(180, 0.08, "sawtooth", 0.12); return; }
+  board[i] = turn;
+  c.tone(turn === 1 ? 620 : 440, 0.08);
+  if (WINS.some(line => line.every(n => board[n - 1] === turn))) return finish(turn);
+  if (board.every(v => v !== 0)) return finish(0);
+  turn = turn === 1 ? 2 : 1;
+  play();
+}
+
+function finish(winner) {
+  over = true;
+  drawBoard(winner === 0 ? "   DRAW!" : ("  PLAYER " + winner + " WINS"));
+  if (winner === 0) c.tone(300, 0.25, "sawtooth", 0.12);
+  else c.arp([523, 659, 784, 1047]);
+  c.setControls([{ label: "PLAY AGAIN", primary: true, onClick: newGame }]);
+  c.setHint(winner === 0 ? "A draw! <kbd>Enter</kbd> to replay."
+                         : "Player " + winner + " wins! <kbd>Enter</kbd> to replay.");
+}
+
+newGame();
+</script>
+</body>
+</html>

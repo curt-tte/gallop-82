@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gallop 82 &mdash; Number Guess</title>
+<link rel="stylesheet" href="calc.css" />
+</head>
+<body>
+<script src="calc.js"></script>
+<script>
+const c = Calc({ brand: "GALLOP 82" });
+const rnd = n => Math.floor(Math.random() * n) + 1;
+
+let secret, guess, tries, feedback;
+
+function newGame() {
+  secret = rnd(100); guess = 50; tries = 0; feedback = "";
+  draw();
+}
+
+function draw() {
+  c.clr();
+  c.out(1, 1, "NUMBER GUESS");
+  c.out(2, 1, "1 TO 100");
+  c.out(4, 1, "GUESS: " + guess);
+  c.out(6, 1, feedback);
+  c.out(8, 1, "TRIES: " + tries);
+  c.render();
+  c.setControls([
+    { label: "\u221210", keys: ["ArrowDown"], onClick: () => adj(-10) },
+    { label: "\u22121", keys: ["ArrowLeft"], onClick: () => adj(-1) },
+    { label: "+1", keys: ["ArrowRight"], onClick: () => adj(1) },
+    { label: "+10", keys: ["ArrowUp"], onClick: () => adj(10) },
+    { label: "GUESS \u25B6", primary: true, onClick: doGuess },
+  ]);
+  c.setHint("Adjust with <kbd>&larr;</kbd><kbd>&rarr;</kbd><kbd>&uarr;</kbd><kbd>&darr;</kbd>, then <kbd>Enter</kbd> to guess.");
+}
+
+function adj(d) { guess = Math.min(100, Math.max(1, guess + d)); c.tone(520, 0.04); draw(); }
+
+function doGuess() {
+  tries++;
+  if (guess === secret) return win();
+  feedback = guess > secret ? "TOO HIGH" : "TOO LOW";
+  c.tone(guess > secret ? 300 : 392, 0.13, "sawtooth", 0.12);
+  draw();
+}
+
+function win() {
+  c.clr();
+  c.out(1, 1, "CORRECT!");
+  c.out(3, 1, "IT WAS " + secret);
+  c.out(5, 1, "IN " + tries + (tries === 1 ? " TRY" : " TRIES"));
+  c.render();
+  c.arp([523, 659, 784, 1047]);
+  c.setControls([{ label: "PLAY AGAIN", primary: true, onClick: newGame }]);
+  c.setHint("Nice! Press <kbd>Enter</kbd> to play again.");
+}
+
+newGame();
+</script>
+</body>
+</html>
