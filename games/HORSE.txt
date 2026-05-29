@@ -49,16 +49,29 @@ PROGRAM:HORSE
 :For(I,1,H)
 :Output(I+1,L1(I)+2," ")
 :L1(I)+int(L2(I)rand)->L1(I)
-:If L1(I)>14
-:14->L1(I)
-:Output(I+1,L1(I)+2,"Q")
-:If L1(I)>=14 and W=0
+:Output(I+1,min(16,L1(I)+2),"Q")
+:End
+:0->K
+:For(I,1,H)
+:If L1(I)>=14
+:Then
+:K+1->K
+:If W=0 or L1(I)>L1(W)
 :I->W
 :End
 :End
+:End
 :ClrHome
+:If K>1
+:Then
+:Output(1,1,"PHOTO FINISH!")
+:Output(2,1,"HORSE")
+:Output(2,7,W)
+:Output(2,9,"WINS")
+:Else
 :Output(1,1,"WINNER: HORSE")
 :Output(1,14,W)
+:End
 :If W=B
 :Then
 :G(6-L2(B))->P
@@ -71,6 +84,8 @@ PROGRAM:HORSE
 :Output(5,7,T)
 :Else
 :Output(3,1,"YOU LOSE")
+:If K>1
+:Output(4,1,"BY A NOSE!")
 :End
 :0->D
 :If M>N

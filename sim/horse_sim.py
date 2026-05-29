@@ -72,15 +72,22 @@ def race(num_horses, bet, wager, M, N, seed=None, frame_delay=0.0, show_frames=T
 
     # ---- race ----
     W = 0
+    photo = False
     frame = 0
     while W == 0:
         frame += 1
+        raw = [0] * (num_horses + 1)  # uncapped distance, for a fair finish order
         for I in range(1, num_horses + 1):
             L1[I] += ti_int(L2[I] * rng.random())
+            raw[I] = L1[I]
             if L1[I] > 14:
-                L1[I] = 14
-            if L1[I] >= 14 and W == 0:
-                W = I
+                L1[I] = 14  # cap to the finish line for drawing
+        # winner = horse that lunged FURTHEST past the line (ties broken at random)
+        crossers = [I for I in range(1, num_horses + 1) if raw[I] >= 14]
+        if crossers:
+            best = max(raw[I] for I in crossers)
+            W = rng.choice([I for I in crossers if raw[I] == best])
+            photo = len(crossers) > 1
         if show_frames:
             s.clr()
             s.output(1, 1, "BET H")
@@ -97,8 +104,14 @@ def race(num_horses, bet, wager, M, N, seed=None, frame_delay=0.0, show_frames=T
 
     # ---- result ----
     s.clr()
-    s.output(1, 1, "WINNER: HORSE")
-    s.output(1, 14, W)
+    if photo:
+        s.output(1, 1, "PHOTO FINISH!")
+        s.output(2, 1, "HORSE")
+        s.output(2, 7, W)
+        s.output(2, 9, "WINS")
+    else:
+        s.output(1, 1, "WINNER: HORSE")
+        s.output(1, 14, W)
     if W == bet:
         P = wager * (6 - L2[bet])
         T = ti_int(P / 10)
@@ -110,6 +123,8 @@ def race(num_horses, bet, wager, M, N, seed=None, frame_delay=0.0, show_frames=T
         s.output(5, 7, T)
     else:
         s.output(3, 1, "YOU LOSE")
+        if photo:
+            s.output(4, 1, "BY A NOSE!")
     if M > N:
         N = M
     s.output(6, 1, "BALANCE $")
@@ -117,6 +132,9 @@ def race(num_horses, bet, wager, M, N, seed=None, frame_delay=0.0, show_frames=T
     s.output(7, 1, "BEST $")
     s.output(7, 7, N)
     print(s.render("--- RESULT ---"))
+    if photo:
+        print(f">> Photo finish! Multiple horses crossed on the same stride, so the "
+              f"win went to horse {W} \u2014 the one that lunged furthest past the line.")
     return M, N
 
 
