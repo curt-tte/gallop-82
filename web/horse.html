@@ -350,7 +350,7 @@ let raceTimer = null;
 function startRace() {
   M -= wager; save();
   setControls([{ label: "RACING...", disabled: true, onClick: () => {} }]);
-  setHint("And they're off!");
+  setHint("Your bet: <strong>H" + bet + " " + NAME[bet] + "</strong> &mdash; and they're off!");
   let W = 0, photo = false;
   raceTimer = setInterval(() => {
     // advance each horse; keep the raw (uncapped) distance for fair finish order
@@ -361,7 +361,7 @@ function startRace() {
       if (L1[i] > 14) L1[i] = 14; // cap to the screen / finish line for drawing
     }
     clr();
-    out(1, 1, fit("BET: " + NAME[bet]));
+    out(1, 1, fit("H" + bet + " " + NAME[bet]));
     for (let i = 1; i <= H; i++) {
       out(i + 1, 1, i);
       out(i + 1, L1[i] + 2, "Q");
