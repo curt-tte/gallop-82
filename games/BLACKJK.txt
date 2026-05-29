@@ -1,0 +1,165 @@
+PROGRAM:BLACKJK
+:ClrHome
+:If C<1
+:100->C
+:1->Z
+:While Z=1
+:ClrHome
+:Output(1,1,"BLACKJACK")
+:Output(2,1,"CASH $")
+:Output(2,7,C)
+:0->W
+:Repeat W>=1 and W<=C
+:Input "BET? ",W
+:End
+:C-W->C
+:0->P
+:0->A
+:For(I,1,2)
+:int(13rand)+1->R
+:If R=1
+:Then
+:11->U
+:1->V
+:Else
+:0->V
+:If R>10
+:Then
+:10->U
+:Else
+:R->U
+:End
+:End
+:P+U->P
+:A+V->A
+:End
+:While P>21 and A>0
+:P-10->P
+:A-1->A
+:End
+:0->D
+:0->E
+:For(I,1,2)
+:int(13rand)+1->R
+:If R=1
+:Then
+:11->U
+:1->V
+:Else
+:0->V
+:If R>10
+:Then
+:10->U
+:Else
+:R->U
+:End
+:End
+:D+U->D
+:E+V->E
+:If I=1
+:U->F
+:End
+:While D>21 and E>0
+:D-10->D
+:E-1->E
+:End
+:ClrHome
+:Output(1,1,"DEALER UP")
+:Output(1,11,F)
+:Output(3,1,"YOU")
+:Output(3,5,P)
+:Output(5,1,"UP=HIT DN=STAY")
+:0->S
+:Repeat S=1 or P>21
+:getKey->K
+:If K=25
+:Then
+:int(13rand)+1->R
+:If R=1
+:Then
+:11->U
+:1->V
+:Else
+:0->V
+:If R>10
+:Then
+:10->U
+:Else
+:R->U
+:End
+:End
+:P+U->P
+:A+V->A
+:While P>21 and A>0
+:P-10->P
+:A-1->A
+:End
+:Output(3,5,"   ")
+:Output(3,5,P)
+:End
+:If K=34
+:1->S
+:End
+:If P<=21
+:Then
+:While D<17
+:int(13rand)+1->R
+:If R=1
+:Then
+:11->U
+:1->V
+:Else
+:0->V
+:If R>10
+:Then
+:10->U
+:Else
+:R->U
+:End
+:End
+:D+U->D
+:E+V->E
+:While D>21 and E>0
+:D-10->D
+:E-1->E
+:End
+:End
+:End
+:ClrHome
+:Output(1,1,"DEALER")
+:Output(1,8,D)
+:Output(3,1,"YOU")
+:Output(3,5,P)
+:If P>21
+:Then
+:Output(5,1,"BUST! YOU LOSE")
+:Else
+:If D>21
+:Then
+:C+2W->C
+:Output(5,1,"DLR BUST! WIN")
+:Else
+:If P>D
+:Then
+:C+2W->C
+:Output(5,1,"YOU WIN")
+:Else
+:If P<D
+:Then
+:Output(5,1,"YOU LOSE")
+:Else
+:C+W->C
+:Output(5,1,"PUSH")
+:End
+:End
+:End
+:End
+:Output(7,1,"CASH $")
+:Output(7,7,C)
+:Pause
+:0->Z
+:If C>=1
+:Input "AGAIN? 1/0 ",Z
+:End
+:ClrHome
+:Output(4,1,"THANKS FOR PLAYING")

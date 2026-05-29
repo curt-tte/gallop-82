@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gallop 82 &mdash; Blackjack</title>
+<link rel="stylesheet" href="calc.css" />
+</head>
+<body>
+<script src="calc.js"></script>
+<script>
+const c = Calc({ brand: "GALLOP 82" });
+const fit = s => String(s).slice(0, 16);
+
+// ---- cards ----
+const RANKS = { 1: "A", 11: "J", 12: "Q", 13: "K" };
+const rankStr = r => RANKS[r] || String(r);
+const cardVal = r => (r === 1 ? 11 : r >= 11 ? 10 : r);
+const draw1 = () => Math.floor(Math.random() * 13) + 1;
+const handStr = cards => cards.map(rankStr).join(" ");
+function total(cards) {
+  let t = 0, a = 0;
+  cards.forEach(r => { t += cardVal(r); if (r === 1) a++; });
+  while (t > 21 && a > 0) { t -= 10; a--; }
+  return t;
+}
+const isBJ = cards => cards.length === 2 && total(cards) === 21;
+
+// ---- state ----
+let money = parseInt(localStorage.getItem("gallop_bj_money") || "100", 10);
+if (!(money >= 1)) money = 100;
+let bet = 10, player = [], dealer = [];
+const save = () => localStorage.setItem("gallop_bj_money", money);
+
+// ---- betting ----
+function betScreen() {
+  if (money < 1) money = 100;
+  save();
+  bet = Math.min(Math.max(bet, 1), money);
+  drawBet();
+}
+function drawBet() {
+  c.clr();
+  c.out(1, 1, "BLACKJACK");
+  c.out(3, 1, "CASH $" + money);
+  c.out(5, 1, "BET  $" + bet);
+  c.out(7, 1, "PAYS 3:2 ON BJ");
+  c.render();
+  c.setControls([
+    { label: "\u22125", keys: ["ArrowDown", "ArrowLeft"], onClick: () => betAdj(-5) },
+    { label: "+5", keys: ["ArrowUp", "ArrowRight"], onClick: () => betAdj(5) },
+    { label: "+25", onClick: () => betAdj(25) },
+    { label: "MAX", keys: ["m", "M"], onClick: () => { bet = money; c.tone(520, 0.04); drawBet(); } },
+    { label: "DEAL \u25B6", primary: true, onClick: deal },
+  ]);
+  c.setHint("Set your bet, then <kbd>Enter</kbd> to deal.");
+}
+function betAdj(d) { bet = Math.min(money, Math.max(1, bet + d)); c.tone(520, 0.04); drawBet(); }
+
+// ---- table render ----
+function renderTable(reveal) {
+  c.clr();
+  c.out(1, 1, fit("BJ  CASH $" + money));
+  const dShown = reveal ? total(dealer) : cardVal(dealer[0]);
+  c.out(3, 1, "DEALER  " + dShown);
+  c.out(4, 1, fit(" " + (reveal ? handStr(dealer) : rankStr(dealer[0]) + " ?")));
+  c.out(6, 1, "YOU     " + total(player));
+  c.out(7, 1, fit(" " + handStr(player)));
+  c.render();
+}
+
+// ---- deal ----
+function deal() {
+  money -= bet; save();
+  player = [draw1(), draw1()];
+  dealer = [draw1(), draw1()];
+  c.tone(440, 0.05); setTimeout(() => c.tone(560, 0.05), 90);
+  if (checkNaturals()) return;
+  playerTurn();
+}
+function checkNaturals() {
+  const pbj = isBJ(player), dbj = isBJ(dealer);
+  if (!pbj && !dbj) return false;
+  renderTable(true);
+  if (pbj && dbj) settle("PUSH BOTH BJ", "push", bet);
+  else if (pbj) settle("BLACKJACK 3:2!", "win", bet + Math.floor(bet * 3 / 2));
+  else settle("DEALER BJ LOSE", "lose", 0);
+  return true;
+}
+
+// ---- player turn ----
+function playerTurn() {
+  renderTable(false);
+  c.setControls([
+    { label: "HIT", keys: ["h", "H", " "], onClick: hit },
+    { label: "STAND", primary: true, keys: ["s", "S"], onClick: stand },
+  ]);
+  c.setHint("<kbd>H</kbd> hit &middot; <kbd>S</kbd> stand. Beat the dealer without passing 21.");
+}
+function hit() {
+  player.push(draw1());
+  c.tone(500, 0.05);
+  if (total(player) > 21) { renderTable(true); return settle("BUST-YOU LOSE", "lose", 0); }
+  renderTable(false);
+}
+function stand() { dealerPlay(); }
+
+// ---- dealer turn ----
+function dealerPlay() {
+  renderTable(true);
+  c.setControls([{ label: "DEALER...", disabled: true, onClick: () => {} }]);
+  c.setHint("Dealer plays to 17.");
+  const tick = () => {
+    renderTable(true);
+    if (total(dealer) < 17) { dealer.push(draw1()); c.tone(420, 0.05); setTimeout(tick, 550); }
+    else resolve();
+  };
+  setTimeout(tick, 550);
+}
+function resolve() {
+  renderTable(true);
+  const p = total(player), d = total(dealer);
+  if (d > 21) settle("DEALER BUST WIN", "win", bet * 2);
+  else if (p > d) settle("YOU WIN", "win", bet * 2);
+  else if (p < d) settle("YOU LOSE", "lose", 0);
+  else settle("PUSH", "push", bet);
+}
+
+// ---- settle ----
+function settle(text, type, gain) {
+  money += gain; save();
+  c.out(1, 1, fit("BJ  CASH $" + money));
+  c.out(8, 1, fit(text));
+  c.render();
+  if (type === "win") c.arp([523, 659, 784, 1047]);
+  else if (type === "push") c.tone(440, 0.16, "triangle", 0.13);
+  else c.arp([392, 330, 262], "sawtooth", 0.13, 0.13);
+  const btns = [];
+  if (money >= 1) btns.push({ label: "NEXT HAND", primary: true, onClick: betScreen });
+  else btns.push({ label: "RESET $100", primary: true, onClick: () => { money = 100; save(); betScreen(); } });
+  c.setControls(btns);
+  c.setHint(text + " &mdash; <kbd>Enter</kbd> for the next hand.");
+}
+
+betScreen();
+</script>
+</body>
+</html>

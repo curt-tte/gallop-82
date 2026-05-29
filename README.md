@@ -16,6 +16,7 @@ family), which means it also runs unchanged on the **TI-83 / TI-83+ / TI-84+ / T
 | `TICTAC`   | `games/TICTAC.txt`       | Two-player Tic-Tac-Toe on the home screen.               |
 | `HORSE`    | `games/HORSE.txt`        | Betting parlor: pick 2-6 horses with speeds/odds, wager your cash, race, repeat. |
 | `SNAKE`    | `games/SNAKE.txt`        | The classic: eat `X`, grow longer, don't hit the walls or yourself. |
+| `BLACKJK`  | `games/BLACKJK.txt`      | Blackjack vs the dealer: hit/stand, soft aces, persistent cash. |
 
 ## TI-82 compatibility notes
 
