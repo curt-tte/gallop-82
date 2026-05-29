@@ -4,252 +4,32 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Gallop 82 &mdash; Horse Racing</title>
-<style>
-  :root {
-    --case: #2b2f36;
-    --case-edge: #1a1d22;
-    --btn: #3a4049;
-    --btn-edge: #20242a;
-    --btn-text: #e8e8e8;
-    --accent: #f5c542;
-    --lcd-bg: #9ead86;
-    --lcd-dark: #2c331f;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: radial-gradient(circle at 50% 20%, #3a4250, #14171c 70%);
-    font-family: "Segoe UI", system-ui, sans-serif;
-    padding: 24px;
-  }
-  .calc {
-    width: 372px;
-    background: linear-gradient(180deg, var(--case) 0%, var(--case-edge) 100%);
-    border-radius: 28px 28px 18px 18px;
-    padding: 20px 22px 26px;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06);
-    border: 1px solid #000;
-  }
-  .brand {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--accent);
-    font-weight: 700;
-    letter-spacing: 1px;
-    margin-bottom: 12px;
-    font-size: 13px;
-  }
-  .brand small { color: #9aa0a8; font-weight: 600; letter-spacing: 0.5px; }
-  .led {
-    display: inline-block;
-    width: 9px; height: 9px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, #9dff7a, #2e9b22);
-    box-shadow: 0 0 7px #4cff3a, inset 0 0 2px #0a3d06;
-    margin-right: 7px;
-    vertical-align: middle;
-    animation: pulse 2.4s infinite ease-in-out;
-  }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.55} }
-  .bezel {
-    background: #11140f;
-    border-radius: 10px;
-    padding: 12px;
-    box-shadow: inset 0 3px 10px rgba(0,0,0,0.7);
-    position: relative;
-  }
-  .lcd {
-    position: relative;
-    background: var(--lcd-bg);
-    border-radius: 4px;
-    padding: 10px 12px;
-    color: var(--lcd-dark);
-    font-family: "Consolas", "Courier New", monospace;
-    font-size: 15px;
-    line-height: 1.32;
-    white-space: pre;
-    min-height: 196px;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.18);
-    letter-spacing: 1px;
-    overflow: hidden;
-  }
-  /* LCD scanlines + glassy sheen */
-  .lcd::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background:
-      repeating-linear-gradient(0deg, rgba(0,0,0,0.06) 0 1px, transparent 1px 3px),
-      radial-gradient(circle at 30% 0%, rgba(255,255,255,0.18), transparent 60%);
-    mix-blend-mode: multiply;
-    animation: flicker 5s infinite steps(60);
-  }
-  @keyframes flicker { 0%,97%{opacity:1} 98%{opacity:0.92} 100%{opacity:1} }
-  .controls {
-    margin-top: 16px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
-  }
-  .hint {
-    text-align: center;
-    color: #9aa0a8;
-    font-size: 12px;
-    min-height: 30px;
-    margin-top: 10px;
-    line-height: 1.4;
-  }
-  .hint kbd {
-    background: #20242a;
-    border: 1px solid #000;
-    border-radius: 4px;
-    padding: 1px 5px;
-    color: #d6dae0;
-    font-size: 11px;
-    font-family: inherit;
-  }
-  button {
-    flex: 0 0 auto;
-    background: linear-gradient(180deg, var(--btn) 0%, var(--btn-edge) 100%);
-    color: var(--btn-text);
-    border: 1px solid #000;
-    border-radius: 8px;
-    padding: 9px 13px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 4px rgba(0,0,0,0.4);
-    transition: transform 0.05s ease, filter 0.1s ease;
-    min-width: 42px;
-  }
-  button:hover { filter: brightness(1.15); }
-  button:active { transform: translateY(1px); }
-  button.primary {
-    background: linear-gradient(180deg, #f5c542, #d09a16);
-    color: #1a1d22;
-    border-color: #000;
-  }
-  button:disabled { opacity: 0.4; cursor: not-allowed; }
-  .sound-toggle {
-    background: none; border: none; color: #9aa0a8; cursor: pointer;
-    font-size: 12px; padding: 0; min-width: 0; box-shadow: none;
-  }
-  .sound-toggle:hover { filter: none; color: var(--accent); }
-</style>
+<link rel="stylesheet" href="calc.css" />
 </head>
 <body>
-  <div class="calc">
-    <div class="brand">
-      <span><span class="led"></span>GALLOP 82</span>
-      <button class="sound-toggle" id="soundBtn" title="Toggle sound">&#128266; SOUND ON</button>
-    </div>
-    <div class="bezel"><div class="lcd" id="screen"></div></div>
-    <div class="controls" id="controls"></div>
-    <div class="hint" id="hint"></div>
-  </div>
-
 <script src="horse_names.js"></script>
+<script src="calc.js"></script>
 <script>
-const COLS = 16, ROWS = 8;
+const c = Calc({ brand: "GALLOP 82" });
+const { clr, out, render, setControls, setHint, ensureAudio } = c;
+const COLS = c.COLS, ROWS = c.ROWS;
 const fit = s => String(s).slice(0, 16);
+const tiInt = x => Math.floor(x);
+const rand = () => Math.random();
+
+// race sounds, built on the shared engine
+const sHoof  = () => c.noise(0.05, 0.16, 380);
+function sWin()  { c.arp([523, 659, 784, 1047], "triangle", 0.11, 0.16); }
+function sLose() { c.arp([392, 330, 262], "sawtooth", 0.13, 0.12); }
+function sBest() { c.arp([784, 988, 1175, 1568], "square", 0.08, 0.12); }
+function sGo()   { c.tone(880, 0.18, "square", 0.16); }
+function sCount(){ c.tone(440, 0.10, "square", 0.12); }
 
 // ---------- persistent state (TI vars M = balance, N = best) ----------
 let M = parseInt(localStorage.getItem("horse_M") || "100", 10);
 let N = parseInt(localStorage.getItem("horse_N") || "0", 10);
 if (!(M >= 1)) M = 100;
 const save = () => { localStorage.setItem("horse_M", M); localStorage.setItem("horse_N", N); };
-
-const screenEl = document.getElementById("screen");
-const controlsEl = document.getElementById("controls");
-const hintEl = document.getElementById("hint");
-const soundBtn = document.getElementById("soundBtn");
-
-// ---------- audio (Web Audio, no files) ----------
-let actx = null, soundOn = true;
-function ensureAudio() {
-  if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
-  if (actx && actx.state === "suspended") actx.resume();
-}
-function tone(freq, dur, type = "square", vol = 0.14, when = 0) {
-  if (!soundOn || !actx) return;
-  const t = actx.currentTime + when;
-  const o = actx.createOscillator(), g = actx.createGain();
-  o.type = type; o.frequency.setValueAtTime(freq, t);
-  g.gain.setValueAtTime(0.0001, t);
-  g.gain.exponentialRampToValueAtTime(vol, t + 0.01);
-  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  o.connect(g).connect(actx.destination);
-  o.start(t); o.stop(t + dur + 0.02);
-}
-function noiseHit(dur = 0.06, vol = 0.18) {
-  if (!soundOn || !actx) return;
-  const n = Math.floor(actx.sampleRate * dur);
-  const buf = actx.createBuffer(1, n, actx.sampleRate);
-  const d = buf.getChannelData(0);
-  for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
-  const src = actx.createBufferSource(); src.buffer = buf;
-  const g = actx.createGain(); g.gain.value = vol;
-  const f = actx.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 380;
-  src.connect(f).connect(g).connect(actx.destination); src.start();
-}
-const sBlip = () => tone(660, 0.05, "square", 0.08);
-const sHoof = () => noiseHit(0.05, 0.16);
-function sWin() { [523,659,784,1047].forEach((f,i) => tone(f, 0.16, "triangle", 0.16, i*0.11)); }
-function sLose() { [392,330,262].forEach((f,i) => tone(f, 0.2, "sawtooth", 0.12, i*0.13)); }
-function sBest() { [784,988,1175,1568].forEach((f,i)=>tone(f,0.12,"square",0.12,i*0.08)); }
-function sGo() { tone(880, 0.18, "square", 0.16); }
-function sCount() { tone(440, 0.1, "square", 0.12); }
-
-soundBtn.onclick = () => {
-  soundOn = !soundOn;
-  soundBtn.innerHTML = soundOn ? "&#128266; SOUND ON" : "&#128263; SOUND OFF";
-  if (soundOn) { ensureAudio(); sBlip(); }
-};
-
-// ---------- screen buffer (Output(row,col,text)) ----------
-let grid;
-function clr() { grid = Array.from({length: ROWS}, () => Array(COLS).fill(" ")); }
-function out(row, col, text) {
-  text = String(text);
-  for (let i = 0; i < text.length; i++) {
-    const c = col - 1 + i, r = row - 1;
-    if (r >= 0 && r < ROWS && c >= 0 && c < COLS) grid[r][c] = text[i];
-  }
-}
-function render() { screenEl.textContent = grid.map(r => r.join("")).join("\n"); }
-
-const tiInt = x => Math.floor(x);
-const rand = () => Math.random();
-
-// ---------- controls + keyboard ----------
-let keyMap = {};
-function setControls(buttons) {
-  controlsEl.innerHTML = "";
-  keyMap = {};
-  let primary = null;
-  for (const b of buttons) {
-    const el = document.createElement("button");
-    el.textContent = b.label;
-    if (b.primary) { el.classList.add("primary"); primary = b; }
-    if (b.disabled) el.disabled = true;
-    el.onclick = () => { ensureAudio(); sBlip(); b.onClick(); };
-    controlsEl.appendChild(el);
-    if (b.keys) for (const k of b.keys) keyMap[k] = b;
-  }
-  if (primary && !keyMap["Enter"]) keyMap["Enter"] = primary;
-}
-document.addEventListener("keydown", (e) => {
-  const b = keyMap[e.key];
-  if (b && !b.disabled) { e.preventDefault(); ensureAudio(); sBlip(); b.onClick(); }
-});
-const setHint = html => hintEl.innerHTML = html;
 
 // ---------- game state ----------
 let H = 4, L1 = [], L2 = [], bet = 1, wager = 10, NAME = [];
