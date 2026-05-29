@@ -353,16 +353,13 @@ function startRace() {
   setHint("And they're off!");
   let W = 0, photo = false;
   raceTimer = setInterval(() => {
-    let finishersThisFrame = 0;
+    // advance each horse; keep the raw (uncapped) distance for fair finish order
+    const raw = [0];
     for (let i = 1; i <= H; i++) {
       L1[i] += tiInt(L2[i] * rand());
-      if (L1[i] > 14) L1[i] = 14;
-      if (L1[i] >= 14) {
-        if (W === 0) W = i;
-        finishersThisFrame++;
-      }
+      raw[i] = L1[i];
+      if (L1[i] > 14) L1[i] = 14; // cap to the screen / finish line for drawing
     }
-    if (W !== 0 && finishersThisFrame > 1) photo = true;
     clr();
     out(1, 1, fit("BET: " + NAME[bet]));
     for (let i = 1; i <= H; i++) {
@@ -372,7 +369,15 @@ function startRace() {
     }
     render();
     sHoof();
-    if (W !== 0) {
+    // any horse that reached/passed the line this frame is a finisher
+    const crossers = [];
+    for (let i = 1; i <= H; i++) if (raw[i] >= 14) crossers.push(i);
+    if (crossers.length) {
+      // winner = furthest past the line; a true tie (equal distance) is broken at random
+      const best = Math.max(...crossers.map(i => raw[i]));
+      const topped = crossers.filter(i => raw[i] === best);
+      W = topped[Math.floor(Math.random() * topped.length)];
+      photo = crossers.length > 1; // more than one crossed on the final stride
       clearInterval(raceTimer);
       setTimeout(() => showResult(W, photo), 500);
     }
