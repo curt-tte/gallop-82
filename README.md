@@ -70,6 +70,19 @@ program editor. You have two options:
 2. Paste a program's text, then export it as an `.8xp` file.
 3. Send the `.8xp` to the calculator with **TI Connect CE** and a USB cable.
 
+## Support / monetization (optional)
+
+Edit `web/support-config.js` before deploying:
+
+| Field | Purpose |
+|-------|---------|
+| `lightningAddress` | e.g. `you@getalby.com` — QR + preset sat amounts via LNURL-pay |
+| `npub` | Nostr public key — copy button + zap links (Primal, Snort) |
+| `nip05` | Optional verified handle shown in the tip jar |
+| `amazonTag` | Optional Amazon Associates tag — shows a TI-84 affiliate link in the how-to section |
+
+If you set only `npub`, the tip jar tries to read `lud16` from your Nostr profile (via nostr.band) and use that as your Lightning address.
+
 ## How to play
 
 On the calculator: press `PRGM`, choose the program name, then `ENTER`.
